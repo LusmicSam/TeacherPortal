@@ -28,7 +28,7 @@ export default function DashboardPage() {
             return;
         }
         setTeacher(JSON.parse(session));
-    }, []);
+    }, [router]);
 
     const handleLogout = () => {
         localStorage.removeItem('teacher_session');
@@ -41,7 +41,6 @@ export default function DashboardPage() {
 
         setIsSearching(true);
         const fetchUrl = `${API_CONFIG.baseUrl.student}${API_CONFIG.student.lookup}`;
-        console.log("Searching Student URL:", fetchUrl);
 
         try {
             // Using the lookup API
@@ -55,7 +54,7 @@ export default function DashboardPage() {
             const results = Array.isArray(json.data) ? json.data : (json.data ? [json.data] : []);
             setSearchResults(results);
         } catch (error) {
-            console.error("Search failed", error);
+            // Search failed
         } finally {
             setIsSearching(false);
         }

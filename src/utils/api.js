@@ -10,9 +10,7 @@ export const API_CONFIG = {
         sectionAnalytics: (sectionName) => `/university/admin/section-analytics/${sectionName}`,
         subUnitDetails: '/university/admin/analytics/sub-unit-details',
         courseStructure: (courseId) => `/university/admin/course-structure/${courseId}`,
-        uLogin: '/university/auth/login',
         unitCompletion: '/auth/teacher/teacher/analytics/unit-completion',
-        getPracticeCoursesByBatch: '/university/admin/getPracticeCoursesByBatch',
     },
 
     courses: (batchId) => `/courses/${batchId}`,
