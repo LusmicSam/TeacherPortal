@@ -38,7 +38,6 @@ export default function StudentDetailView({ student, onBack }) {
             const needsLookup = !currentStudent.student_id && !currentStudent.uuid;
 
             if (needsLookup || (!currentStudent.batch_id && !currentStudent.batch)) {
-                console.log("Missing ID/Batch, performing lookup for:", currentStudent.uni_reg_id || currentStudent.reg_id);
                 try {
                     const lookupRes = await fetch(`${API_CONFIG.baseUrl.student}${API_CONFIG.student.lookup}`, {
                         method: 'POST',
@@ -50,14 +49,13 @@ export default function StudentDetailView({ student, onBack }) {
                     const found = Array.isArray(lookupJson.data) ? lookupJson.data[0] : lookupJson.data;
 
                     if (found) {
-                        console.log("Lookup successful:", found);
                         currentStudent = { ...currentStudent, ...found };
                         setFullStudent(currentStudent);
                     } else {
-                        console.warn("Lookup returned no data");
+                        // Lookup returned no data
                     }
                 } catch (e) {
-                    console.error("Lookup failed", e);
+                    // Lookup failed
                 }
             } else {
                 setFullStudent(student);
@@ -78,6 +76,7 @@ export default function StudentDetailView({ student, onBack }) {
         if (inspectingSubUnit && selectedCourse) {
             fetchHistory(inspectingSubUnit.unitId, inspectingSubUnit.subUnitId, resultType);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resultType]);
 
     const fetchCourses = async (batchId) => {
@@ -101,8 +100,6 @@ export default function StudentDetailView({ student, onBack }) {
     const fetchUnitCompletion = async (studentData, courseId, units) => {
         if (!units || units.length === 0) return;
 
-        console.log("Starting fetchUnitCompletion for units:", units.length);
-
         const completions = {};
         let totalCompletion = 0;
         let fetchedCount = 0;
@@ -124,7 +121,6 @@ export default function StudentDetailView({ student, onBack }) {
                 });
 
                 const data = await res.json();
-                console.log(`Completion fetch for unit ${unit.unit_id}:`, data);
 
                 if (data.success && data.data) {
                     // Robust parsing: Handle string/number and nested fields
@@ -134,7 +130,6 @@ export default function StudentDetailView({ student, onBack }) {
                     }
 
                     const progress = parseInt(rawVal, 10) || 0;
-                    console.log(`Parsed progress for unit ${unit.unit_id}:`, progress);
 
                     completions[unit.unit_id] = progress;
                     totalCompletion += progress;
@@ -143,17 +138,14 @@ export default function StudentDetailView({ student, onBack }) {
                     completions[unit.unit_id] = 0;
                 }
             } catch (e) {
-                console.error(`Failed to fetch completion for unit ${unit.unit_id}`, e);
                 completions[unit.unit_id] = 0;
             }
         }));
 
-        console.log("Final Unit Completions Map:", completions);
         setUnitCompletions(completions);
 
         // Calculate average course progress based on units
         const calculatedOverall = units.length > 0 ? Math.round(totalCompletion / units.length) : 0;
-        console.log("Calculated Overall Progress:", calculatedOverall);
         setOverallCourseProgress(calculatedOverall);
     };
 
@@ -236,7 +228,6 @@ export default function StudentDetailView({ student, onBack }) {
                 attempt: 1 // Default to attempt 1 per user request
             };
 
-            console.log("Fetching History Payload:", payload);
             const res = await fetch(`${API_CONFIG.baseUrl.admin}${API_CONFIG.admin.subUnitDetails}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -246,7 +237,6 @@ export default function StudentDetailView({ student, onBack }) {
 
             if (!res.ok) {
                 const errText = await res.text();
-                console.error("History Fetch Error:", res.status, errText);
                 try {
                     const errJson = JSON.parse(errText);
                     if (errJson.error) alert(`Error: ${errJson.error}`); // Temporary feedback
@@ -507,7 +497,6 @@ const DeepDiveRightPanel = ({ student, courseId, subUnit, history, loadingHistor
                 attempt: attempt.attempt || attempt.attempt_count || 1 // Default to 1 if missing
             };
 
-            console.log("Fetching Attempt Details Payload:", payload);
             // UPDATE: Use Admin Endpoint for consistency as it supports proper student lookup
             const res = await fetch(`${API_CONFIG.baseUrl.admin}${API_CONFIG.admin.subUnitDetails}`, {
                 method: 'POST',
@@ -517,8 +506,7 @@ const DeepDiveRightPanel = ({ student, courseId, subUnit, history, loadingHistor
             });
 
             if (!res.ok) {
-                const errText = await res.text();
-                console.error("Attempt Details Fetch Error:", res.status, errText);
+                await res.text();
             }
 
             const data = await res.json();
@@ -526,10 +514,10 @@ const DeepDiveRightPanel = ({ student, courseId, subUnit, history, loadingHistor
             if (data.success) {
                 setAttemptDetails(data.data);
             } else {
-                console.error("Failed to load details", data);
+                // Failed to load details
             }
         } catch (e) {
-            console.error(e);
+            // Error
         } finally {
             setLoadingDetails(false);
         }

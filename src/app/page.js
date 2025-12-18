@@ -26,7 +26,6 @@ export default function LoginPage() {
 
         try {
             const url = `${API_CONFIG.baseUrl.admin}${API_CONFIG.teacher.login}`;
-            console.log("Teacher Login URL:", url);
             const res = await fetch(`${API_CONFIG.baseUrl.teacher || API_CONFIG.baseUrl.admin}${API_CONFIG.teacher.login}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -34,10 +33,7 @@ export default function LoginPage() {
                 credentials: 'include'
             });
 
-            console.log("Teacher Login Status:", res.status);
-
             const data = await res.json();
-            console.log("Teacher Login Response:", data);
 
             if (res.ok && data.success) {
                 // SUCCESS: Save session
@@ -45,16 +41,13 @@ export default function LoginPage() {
 
                 // --- TEMPORARY FIX: Background Admin Login ---
                 try {
-                    console.log("Attempting background admin auth...");
                     await fetch('/api/proxy/backend/university/auth/login', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: 'ujjwalkumar16895@gmail.com', password: 'abcd' }),
                         credentials: 'include' // Important for cookies
                     });
-                    console.log("Background admin auth completed.");
                 } catch (adminErr) {
-                    console.error("Background admin auth failed:", adminErr);
                     // We don't block the teacher login if this fails, but it's good to know
                 }
                 // ---------------------------------------------

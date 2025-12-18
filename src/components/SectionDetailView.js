@@ -19,7 +19,6 @@ export default function SectionDetailView({ section, onBack, onStudentSelect }) 
 
                 // Adjust API base URL logic for Teacher Portal if different, but sticking to provided API_CONFIG structure
                 const url = `${API_CONFIG.baseUrl.admin}${API_CONFIG.admin.sectionAnalytics(encodeURIComponent(sectionName))}`;
-                console.log("Fetching Section Analytics URL:", url);
                 const res = await fetch(url, {
                     credentials: 'include'
                 });
@@ -28,7 +27,7 @@ export default function SectionDetailView({ section, onBack, onStudentSelect }) 
                     setData(json.data);
                 }
             } catch (error) {
-                console.error("Failed to fetch section analytics:", error);
+                // Failed to fetch
             } finally {
                 setLoading(false);
             }
